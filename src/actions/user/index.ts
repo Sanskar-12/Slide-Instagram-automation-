@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { createUser, findUser } from "./queries";
 import { refreshToken } from "@/lib/fetch";
 import { updateIntegration } from "../integrations";
+import { client } from "@/lib/prisma";
 
 export const onCurrentUser = async () => {
   const user = await currentUser();
@@ -71,6 +72,29 @@ export const onBoardUser = async () => {
         firstname: newUser.firstname,
         lastname: newUser.lastname,
       },
+    };
+  } catch (error) {
+    console.log(error);
+    return {
+      status: 500,
+    };
+  }
+};
+
+export const onUserInfo = async () => {
+  const user = await onCurrentUser();
+
+  try {
+    const profile = await findUser(user.id);
+
+    if (profile)
+      return {
+        status: 200,
+        data: profile,
+      };
+
+    return {
+      status: 404,
     };
   } catch (error) {
     console.log(error);
